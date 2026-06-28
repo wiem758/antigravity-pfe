@@ -1,0 +1,264 @@
+<div class="shell" [class.sidebar-open]="sidebarOpen">
+
+  <div class="sidebar-backdrop" *ngIf="sidebarOpen" (click)="toggleSidebar()" aria-hidden="true"></div>
+
+  <!-- Sidebar -->
+  <aside class="sidebar" [class.open]="sidebarOpen" aria-label="Historique des conversations">
+
+    <div class="sidebar-head">
+      <div class="brand">
+        <div class="brand-icon" aria-hidden="true">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="2" y="7" width="20" height="14" rx="2"/>
+            <path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/>
+          </svg>
+        </div>
+        <span class="brand-name">DWEXO</span>
+      </div>
+      <button class="icon-btn sidebar-close" (click)="toggleSidebar()" aria-label="Fermer le menu">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M18 6L6 18M6 6l12 12"/>
+        </svg>
+      </button>
+    </div>
+
+    <button class="new-chat-btn" (click)="newChat()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M12 5v14M5 12h14"/>
+      </svg>
+      Nouvelle conversation
+    </button>
+
+    <div class="history-scroll">
+      <div class="history-empty" *ngIf="!sessions.length">
+        <p>Aucune conversation pour le moment.</p>
+      </div>
+
+      <div class="history-group" *ngIf="todaySessions.length">
+        <span class="history-label">Aujourd'hui</span>
+        <button type="button"
+                class="history-item"
+                *ngFor="let s of todaySessions"
+                [class.active]="s.id === currentSessionId"
+                (click)="loadSession(s)">
+          <svg class="history-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+          </svg>
+          <span class="history-title">{{ s.title }}</span>
+        </button>
+      </div>
+
+      <div class="history-group" *ngIf="olderSessions.length">
+        <span class="history-label">7 derniers jours</span>
+        <button type="button"
+                class="history-item"
+                *ngFor="let s of olderSessions"
+                [class.active]="s.id === currentSessionId"
+                (click)="loadSession(s)">
+          <svg class="history-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+          </svg>
+          <span class="history-title">{{ s.title }}</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="sidebar-foot">
+      <div class="user-row">
+        <div class="user-av" aria-hidden="true">A</div>
+        <div class="user-meta">
+          <span class="user-name">Asma Amara</span>
+          <span class="user-plan">DWEXO Finance</span>
+        </div>
+      </div>
+    </div>
+
+  </aside>
+
+  <!-- Main -->
+  <main class="main">
+
+    <header class="topbar">
+      <div class="topbar-left">
+        <button class="icon-btn" (click)="toggleSidebar()" aria-label="Ouvrir le menu">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M3 12h18M3 6h18M3 18h18"/>
+          </svg>
+        </button>
+        <div class="model-selector">
+          <span class="model-name">DWEXO Assistant</span>
+          <span class="model-badge">Finance</span>
+        </div>
+      </div>
+      <div class="topbar-right">
+        <div class="status-badge" role="status">
+          <span class="pulse-dot" aria-hidden="true"></span>
+          En ligne
+        </div>
+        <button class="icon-btn" (click)="newChat()" aria-label="Nouvelle conversation">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 20h9M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- Welcome -->
+    <section class="welcome" *ngIf="messages.length === 0" aria-label="Accueil">
+
+      <div class="welcome-logo" aria-hidden="true">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <rect x="2" y="7" width="20" height="14" rx="2"/>
+          <path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/>
+          <path d="M12 12v.01"/>
+        </svg>
+      </div>
+
+      <h1 class="welcome-title">Bonjour, Asma</h1>
+      <p class="welcome-sub">
+        Je suis votre assistant financier DWEXO. Décrivez simplement ce que vous souhaitez faire —
+        je comprends le français, العربية, English et التونسي.
+      </p>
+
+      <div class="sug-grid">
+        <button type="button"
+                class="sug-card"
+                *ngFor="let s of suggestions"
+                (click)="useSuggestion(s)">
+          <span class="sug-icon" aria-hidden="true">{{ s.icon }}</span>
+          <span class="sug-title">{{ s.title }}</span>
+          <span class="sug-desc">{{ s.desc }}</span>
+        </button>
+      </div>
+
+    </section>
+
+    <!-- Messages -->
+    <div class="messages" *ngIf="messages.length > 0" #msgContainer role="log" aria-live="polite">
+      <div class="msg-wrap">
+
+        <article class="msg-row" *ngFor="let m of messages" [class.is-user]="m.role === 'user'">
+          <div class="msg-av"
+               [class.av-bot]="m.role === 'assistant'"
+               [class.av-usr]="m.role === 'user'"
+               aria-hidden="true">
+            <ng-container *ngIf="m.role === 'assistant'; else userAvatar">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="2" y="7" width="20" height="14" rx="2"/>
+                <path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/>
+              </svg>
+            </ng-container>
+            <ng-template #userAvatar>A</ng-template>
+          </div>
+
+          <div class="msg-body">
+            <div class="msg-name">{{ m.role === 'assistant' ? 'DWEXO Assistant' : 'Vous' }}</div>
+            <div class="msg-text" [class.err]="m.isError">{{ m.content }}</div>
+
+            <div class="tx-card" *ngIf="m.transactionData">
+              <div class="tx-head">
+                <span class="tx-type"
+                      [class.tx-debit]="m.transactionData.type_transaction === 'debit'"
+                      [class.tx-credit]="m.transactionData.type_transaction === 'credit'"
+                      [class.tx-transfert]="m.transactionData.type_transaction === 'transfert'">
+                  <span *ngIf="m.transactionData.type_transaction === 'debit'">Débit</span>
+                  <span *ngIf="m.transactionData.type_transaction === 'credit'">Crédit</span>
+                  <span *ngIf="m.transactionData.type_transaction === 'transfert'">Transfert</span>
+                </span>
+                <span class="tx-num">{{ m.transactionData.numero }}</span>
+                <span class="tx-etat"
+                      [class.e-paye]="m.transactionData.etat === 'Payé'"
+                      [class.e-attente]="m.transactionData.etat === 'En attente'"
+                      [class.e-annule]="m.transactionData.etat === 'Annulé'">
+                  {{ m.transactionData.etat }}
+                </span>
+              </div>
+              <div class="tx-body">
+                <div class="tx-amount">
+                  {{ m.transactionData.montant | number:'1.3-3' }}
+                  <span class="tx-devise">{{ m.transactionData.devise }}</span>
+                </div>
+                <div class="tx-meta">
+                  <span class="tx-tag" *ngIf="m.transactionData.client_nom">
+                    {{ m.transactionData.client_nom }}
+                  </span>
+                  <span class="tx-tag" *ngIf="m.transactionData.fournisseur_nom">
+                    {{ m.transactionData.fournisseur_nom }}
+                  </span>
+                  <span class="tx-tag" *ngIf="m.transactionData.source_nom">
+                    {{ m.transactionData.source_nom }} → {{ m.transactionData.destination_nom }}
+                  </span>
+                  <span class="tx-tag" *ngIf="m.transactionData.mode_paiement">
+                    {{ m.transactionData.mode_paiement }}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <time class="msg-time">{{ m.timestamp | date:'HH:mm' }}</time>
+          </div>
+        </article>
+
+        <article class="msg-row" *ngIf="isLoading">
+          <div class="msg-av av-bot" aria-hidden="true">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="2" y="7" width="20" height="14" rx="2"/>
+              <path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/>
+            </svg>
+          </div>
+          <div class="msg-body">
+            <div class="msg-name">DWEXO Assistant</div>
+            <div class="typing" aria-label="Réponse en cours">
+              <span></span><span></span><span></span>
+            </div>
+          </div>
+        </article>
+
+      </div>
+    </div>
+
+    <!-- Input -->
+    <footer class="input-zone">
+      <div class="quick-row" *ngIf="messages.length === 0">
+        <button type="button"
+                class="q-chip"
+                *ngFor="let q of quickChips"
+                [disabled]="isLoading"
+                (click)="useChip(q)">
+          {{ q.label }}
+        </button>
+      </div>
+
+      <div class="input-box" [class.focus]="inputFocused">
+        <textarea
+          [(ngModel)]="userInput"
+          (keydown)="onKey($event)"
+          (input)="autoResize($event)"
+          (focus)="inputFocused = true"
+          (blur)="inputFocused = false"
+          [placeholder]="placeholder"
+          rows="1"
+          [disabled]="isLoading"
+          aria-label="Votre message"
+          #inputEl>
+        </textarea>
+        <button type="button"
+                class="send-btn"
+                [class.ready]="userInput.trim()"
+                [disabled]="isLoading || !userInput.trim()"
+                (click)="send()"
+                aria-label="Envoyer">
+          <svg *ngIf="!isLoading" width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M3.4 20.4 22 12 3.4 3.6l2.8 7.2L17 12l-10.8 1.2-2.8 7.2z"/>
+          </svg>
+          <div class="spinner" *ngIf="isLoading"></div>
+        </button>
+      </div>
+
+      <p class="input-hint">
+        DWEXO Assistant peut se tromper. Vérifiez les opérations importantes.
+      </p>
+    </footer>
+
+  </main>
+</div>
